@@ -1,0 +1,70 @@
+[33mcommit 54e10379725431646acaac55508ba3919874c550[m[33m ([m[1;36mHEAD -> [m[1;32mfeature[m[33m)[m
+Author: Karam Gbaren <karam99.k@hotmail.com>
+Date:   Wed Oct 26 11:22:53 2022 +0300
+
+    Adding a Django development environment and update vagrantfile
+
+[1mdiff --git a/Vagrantfile b/Vagrantfile[m
+[1mindex 85cf7f5..54084ad 100644[m
+[1m--- a/Vagrantfile[m
+[1m+++ b/Vagrantfile[m
+[36m@@ -17,6 +17,10 @@[m [mVagrant.configure("2") do |config|[m
+   config.vm.provider "virtualbox" do |vb|[m
+    vb.memory = "1024"[m
+   end[m
+[32m+[m[32m  config.vm.network([m
+[32m+[m	[32m"forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"[m
+[32m+[m[32m  )[m
+[32m+[m[32m  config.vm.provision "shell", path: "setup.sh", privileged: false[m
+   # Disable automatic box update checking. If you disable this, then[m
+   # boxes will only be checked for updates when the user runs[m
+   # `vagrant box outdated`. This is not recommended.[m
+[1mdiff --git a/manage.py b/manage.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a81bc3e[m
+[1m--- /dev/null[m
+[1m+++ b/manage.py[m
+[36m@@ -0,0 +1,22 @@[m
+[32m+[m[32m#!/usr/bin/env python[m
+[32m+[m[32m"""Django's command-line utility for administrative tasks."""[m
+[32m+[m[32mimport os[m
+[32m+[m[32mimport sys[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef main():[m
+[32m+[m[32m    """Run administrative tasks."""[m
+[32m+[m[32m    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'beyond_tutorial.settings')[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        from django.core.management import execute_from_command_line[m
+[32m+[m[32m    except ImportError as exc:[m
+[32m+[m[32m        raise ImportError([m
+[32m+[m[32m            "Couldn't import Django. Are you sure it's installed and "[m
+[32m+[m[32m            "available on your PYTHONPATH environment variable? Did you "[m
+[32m+[m[32m            "forget to activate a virtual environment?"[m
+[32m+[m[32m        ) from exc[m
+[32m+[m[32m    execute_from_command_line(sys.argv)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    main()[m
+[1mdiff --git a/setup.sh b/setup.sh[m
+[1mnew file mode 100644[m
+[1mindex 0000000..82262bf[m
+[1m--- /dev/null[m
+[1m+++ b/setup.sh[m
+[36m@@ -0,0 +1,14 @@[m
+[32m+[m[32m#!/bin/bash -ex[m
+[32m+[m[32m# The -e option would make our script exit with an error if any command[m
+[32m+[m[32m# fails while the -x option makes verbosely it output what it does[m
+[32m+[m[32m# Install Pipenv, the -n option makes sudo fail instead of asking for a[m
+[32m+[m[32m# password if we don’t have sufficient privileges to run it[m
+[32m+[m[32msudo -n dnf install -y pipenv[m
+[32m+[m[32mcd /vagrant[m
+[32m+[m[32m# Install dependencies with Pipenv[m
+[32m+[m[32mpipenv sync --dev[m
+[32m+[m[32m# run our app. setsid, the parentheses and "&" are used to perform a "double[m
+[32m+[m[32m# fork" so that out app stays up after the setup script finishes.[m
+[32m+[m[32m# The app logs are redirected to the `runserver.log` file.[m
+[32m+[m[32m(setsid pipenv run \[m
+[32m+[m[32m    python manage.py runserver 0.0.0.0:8000 > runserver.log 2>&1 &)[m
+\ No newline at end of file[m
